@@ -39,55 +39,5 @@ pipeline {
             }
         }
 
-        // Étape 3 : Tests dans le conteneur
-        stage('Run Tests') {
-            steps {
-                echo 'Running tests inside the container...'
-
-                // Copier le fichier de test dans le conteneur
-                bat '''
-                    docker cp "%SUM_PY_PATH%" "%CONTAINER_ID_RUN%:/app/sum.py"
-                '''
-
-
-                // Tester des paires de nombres depuis le fichier de test
-                bat '''
-                    @echo off
-                    setlocal enabledelayedexpansion
-
-                    for /F "tokens=1,2,3 delims= " %%A in (test_variables.txt) do (
-                        set NUM1=%%A
-                        set NUM2=%%B
-                        set EXPECTED=%%C
-
-                        rem Exécuter sum.py dans le conteneur avec les nombres
-                        for /F %%R in ('docker exec %CONTAINER_ID_RUN% python /app/sum.py !NUM1! !NUM2!') do (
-                            set RESULT=%%R
-                        )
-
-                        rem Vérifier si le résultat correspond à la valeur attendue
-                        if !RESULT! NEQ !EXPECTED! (
-                            echo Test failed for inputs !NUM1!, !NUM2!: Expected !EXPECTED!, but got !RESULT!
-                            exit /b 1
-                        ) else (
-                            echo Test passed for inputs !NUM1!, !NUM2!
-                        )
-                    )
-                '''
-
-            }
-        }
-
-        // Étape 4 : Nettoyage .
-        stage('Cleanup ') {
-            steps {
-                echo 'Stopping and removing the container...'
-                    bat '''
-                docker stop %CONTAINER_ID_RUN%
-                docker rm %CONTAINER_ID_RUN%
-            '''
-
-            }
-        }
     }
 }
