@@ -10,13 +10,15 @@ pipeline {
     }
 
     stages {
+       
+
         stage('Build') {
             steps {
-                echo 'Building Docker image...'
-                
+                echo 'Starting Build Stage...'
                 sh "docker build -t python-sum ${DIR_PATH}"
             }
         }
+
 
         stage('Run') {
             steps {
