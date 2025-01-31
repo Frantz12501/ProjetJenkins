@@ -15,7 +15,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Starting Build Stage...'
-                 "docker build -t python-sum ${DIR_PATH}"
+                bat "docker build -t python-sum ${DIR_PATH}"
             }
         }
 
